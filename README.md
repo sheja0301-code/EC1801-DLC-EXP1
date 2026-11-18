@@ -20,18 +20,45 @@ exp1_boolean_min_tb.v	Verilog testbench
 exp1_boolean_min.vcd	VCD waveform dump generated during simulation
 
 ## Verilog Program
-
-
+  //gedit fun.v 
+  module fun ( 
+  input wire A, 
+  input wire B, 
+  output wire F 
+  ); 
+  assign F = (~A) | B ;    // F = A' + B 
+  endmodule
 
 ## TestBench Program
-
-
-
-
-
-
-
+// gedit tb.v 
+module tb; 
+  reg A, B; 
+  wire F; 
+  // Instantiate the design under test (DUT)    
+  fun uut ( 
+    .A(A), 
+    .B(B), 
+    .F(F) 
+  );
+  initial begin 
+     //---- VCD dump setup----        
+     $ dumpfile("fun.vcd");   // name of the VCD file to be generated        
+     $ dumpvars(0, tb);   // dump all signals in this testbench hierarchy 
+     
+     //---- Apply all 4 input combinations----        
+     $ monitor("Time=%0t A=%b B=%b | F=%b", $time, A, B, F);
+     
+     A=0; B=0;#10; 
+     A=0; B=1;#10; 
+     A=1; B=0;#10; 
+     A=1; B=1;#10; 
+     
+     #10 $finish; 
+    end 
     
+endmodule
+
+
 ## Truth Table
  
 <img width="795" height="311" alt="image" src="https://github.com/user-attachments/assets/dd4ba5b9-016b-4ae5-a693-f309c60c4c0e" />
@@ -68,14 +95,19 @@ In DVE:
 2.	Locate the signals:
 o	A
 o	B
-o	C
-o	D
 o	F
 3.	Add the signals to the waveform window.
 4.	Run/inspect the waveform.
-5.	Verify that F = 1 whenever B and D are equal.
-6.	Verify that F = 0 whenever B and D are different.
+5.	Verify that F = 1 whenever A = 0 (regardless of B), since A' = 1 dominates the
+   ORexpression.
+6.	Verify that F = 1 whenever B = 1 (regardless of A), since B alone can force
+   the OR output high.
+7.  Verify that F = 0 only when A = 1 AND B = 0 — this is the single combination
+   where both A' and B are 0. 
 The waveform should agree with the truth table.
+
+<img width="812" height="522" alt="Screenshot 2026-11-18 225127" src="https://github.com/user-attachments/assets/a873a70b-3302-4aaa-90f1-0b6c73281f83" />
+
  
 ### Expected Result
 The Boolean function
@@ -85,6 +117,7 @@ and successfully implemented using Verilog HDL.
 
 ## OUTPUT
 
+<img width="1832" height="833" alt="Screenshot 2026-11-02 120459" src="https://github.com/user-attachments/assets/28869959-219e-4b06-8aca-10e0680909f5" />
 
 
 The design was compiled and simulated using Synopsys VCS, and the functionality was verified using DVE waveform analysis.
